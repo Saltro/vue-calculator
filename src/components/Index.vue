@@ -1,37 +1,119 @@
 <template>
   <div id="container">
-    <span id="result">{{ result }}</span>
-    <button id="ac">AC</button>
-    <button id="not">±</button>
-    <button id="percent">%</button>
-    <button id="division">÷</button>
-    <button id="seven">7</button>
-    <button id="eight">8</button>
-    <button id="nine">9</button>
-    <button id="multiply">×</button>
-    <button id="four">4</button>
-    <button id="five">5</button>
-    <button id="six">6</button>
-    <button id="minus">-</button>
-    <button id="one">1</button>
-    <button id="two">2</button>
-    <button id="three">3</button>
-    <button id="plus">+</button>
-    <button id="zero">0</button>
-    <button id="dot">.</button>
-    <button id="equal">=</button>
+    <div id="result" ref="resultBox">
+      <span ref="resultNum">{{ result }}</span>
+    </div>
+    <button id="ac" @click="result = '0'">AC</button>
+    <button id="not" @click="reverse">±</button>
+    <button id="percent" @click="percent">%</button>
+    <button id="division" @click="add('÷')">÷</button>
+    <button id="seven" @click="add(7)">7</button>
+    <button id="eight" @click="add(8)">8</button>
+    <button id="nine" @click="add(9)">9</button>
+    <button id="multiply" @click="add('×')">×</button>
+    <button id="four" @click="add(4)">4</button>
+    <button id="five" @click="add(5)">5</button>
+    <button id="six" @click="add(6)">6</button>
+    <button id="minus" @click="add('-')">-</button>
+    <button id="one" @click="add(1)">1</button>
+    <button id="two" @click="add(2)">2</button>
+    <button id="three" @click="add(3)">3</button>
+    <button id="plus" @click="add('+')">+</button>
+    <button id="zero" @click="add(0)">0</button>
+    <button id="dot" @click="add('.')">.</button>
+    <button id="equal" @click="calcResult">=</button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/runtime-core";
+import { defineComponent, ref, onMounted, getCurrentInstance, computed } from "@vue/runtime-core";
 
 export default defineComponent({
   setup () {
-    const result = ref<string>('0')
+    const resultTemp = ref<string>('0')
+    let numberLength = 0
+
+    const result = computed({
+      get: () => {
+        console.log('get', resultTemp.value)
+        return resultTemp.value
+      },
+      set: (val) => {
+        console.log('set', val)
+        if (val.length > numberLength) {
+          val = val.slice(0, numberLength)
+        }
+        resultTemp.value = val
+      }
+    })
+
+    // const resultBox = ref(null)
+
+    onMounted(() => {
+      // console.log(getCurrentInstance()?.ctx.$refs.resultBox.clientWidth)
+      // console.log(getCurrentInstance()?.ctx.$refs.resultNum.clientWidth)
+      numberLength = getCurrentInstance()?.ctx.$refs.resultBox.clientWidth / getCurrentInstance()?.ctx.$refs.resultNum.clientWidth
+      // console.log(numberLength)
+    })
+
+    const add = (symbol: number | string) => {
+      if (result.value === 'ERROR') {
+        result.value = ''
+      }
+      if (typeof symbol === 'number') {
+        if (result.value === '0') {
+          result.value = ''
+        }
+        symbol = symbol.toString()
+      } else if (typeof symbol === 'string') {
+        switch (symbol) {
+          case '-':
+            if (result.value === '0') {
+              result.value = ''
+            }
+            break
+        }
+      }
+      result.value += symbol
+    }
+
+    const calcResult = () => {
+      result.value = result.value.replaceAll('×', '*')
+      result.value = result.value.replaceAll('÷', '/')
+      // console.log(result.value)
+      try {
+        result.value = eval(result.value).toString()
+      } catch (e) {
+        if (e instanceof SyntaxError) {
+          result.value = 'ERROR'
+        }
+      }
+    }
+
+    const reverse = () => {
+      calcResult()
+      if (result.value !== 'ERROR' && result.value !== '0') {
+        if (result.value[0] === '-') {
+          result.value = result.value.slice(1)
+        } else {
+          result.value = '-' + result.value
+        }
+      }
+    }
+
+    const percent = () => {
+      calcResult()
+      if (result.value !== 'ERROR') {
+        result.value = (+result.value / 100).toString()
+      }
+    }
     
     return {
-      result
+      result,
+      add,
+      calcResult,
+      reverse,
+      percent
     }
   }
 })
@@ -60,10 +142,14 @@ export default defineComponent({
               -5px -5px 15px rgba($color: #FFFFFF, $alpha: 0.6);
   
   #result {
-    color: #646464;
     grid-area: res;
-    font-size: 64px;
-    text-align: right;
+    overflow: hidden;
+    span {
+      font-size: 64px;
+      text-align: right;
+      color: #646464;
+      float: right;
+    }
   }
   
   button {

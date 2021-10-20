@@ -29,5 +29,6 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   background-color: #EAEAEA;
+  user-select: none;
 }
 </style>
