@@ -14,6 +14,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+@font-face {
+  src: url('/PINGFANG\ SC\ REGULAR.TTF');
+  font-family: 'PingFang';
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -23,12 +28,13 @@ export default defineComponent({
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  width: 100vw;
-  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #EAEAEA;
   user-select: none;
+  font-family: 'PingFang';
 }
 </style>

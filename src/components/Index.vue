@@ -121,14 +121,11 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 #container {
-  width: 90%;
-  height: 90%;
-  max-width: 500px;
-  max-height: 750px;
   border-radius: 30px;
   box-sizing: border-box;
   display: grid;
-  grid: repeat(6, 1fr) / repeat(4, 1fr);
+  grid-template-rows: repeat(6, 90px);
+  grid-template-columns: repeat(4, 90px);
   grid-template-areas: 'res res res res'
                        'ac notbtn per div'
                        'seven eight nine mul'
@@ -244,6 +241,23 @@ export default defineComponent({
 
   #equal {
     grid-area: equal;
+  }
+}
+
+@media only screen and (max-width: 1023px) {
+  #container {
+    grid-template-rows: repeat(6, 60px);
+    grid-template-columns: repeat(4, 60px);
+
+    #result {
+      span {
+        font-size: 48px;
+      }
+    }
+
+    button {
+      font-size: 28px;
+    }
   }
 }
 </style>
