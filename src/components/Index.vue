@@ -35,11 +35,11 @@ export default defineComponent({
 
     const result = computed({
       get: () => {
-        console.log('get', resultTemp.value)
+        // console.log('get', resultTemp.value)
         return resultTemp.value
       },
       set: (val) => {
-        console.log('set', val)
+        // console.log('set', val)
         if (val.length > numberLength) {
           val = val.slice(0, numberLength)
         }
@@ -47,12 +47,14 @@ export default defineComponent({
       }
     })
 
-    // const resultBox = ref(null)
+    const resultBox = ref<Element>(document.createElement('a'))
+    const resultNum = ref<Element>(document.createElement('a'))
 
     onMounted(() => {
-      // console.log(getCurrentInstance()?.ctx.$refs.resultBox.clientWidth)
-      // console.log(getCurrentInstance()?.ctx.$refs.resultNum.clientWidth)
-      numberLength = getCurrentInstance()?.ctx.$refs.resultBox.clientWidth / getCurrentInstance()?.ctx.$refs.resultNum.clientWidth
+      // console.log(resultNum.value)
+      // console.log(resultBox.value.clientWidth)
+      // console.log(resultNum.value.clientWidth)
+      numberLength = resultBox.value.clientWidth / resultNum.value.clientWidth
       // console.log(numberLength)
     })
 
@@ -113,7 +115,9 @@ export default defineComponent({
       add,
       calcResult,
       reverse,
-      percent
+      percent,
+      resultBox,
+      resultNum
     }
   }
 })
