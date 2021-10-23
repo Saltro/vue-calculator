@@ -7,26 +7,26 @@
     <button id="not" @click="reverse">±</button>
     <button id="percent" @click="percent">%</button>
     <button id="division" @click="add('÷')">÷</button>
-    <button id="seven" @click="add(7)">7</button>
-    <button id="eight" @click="add(8)">8</button>
-    <button id="nine" @click="add(9)">9</button>
+    <button id="seven" @click="add('7')">7</button>
+    <button id="eight" @click="add('8')">8</button>
+    <button id="nine" @click="add('9')">9</button>
     <button id="multiply" @click="add('×')">×</button>
-    <button id="four" @click="add(4)">4</button>
-    <button id="five" @click="add(5)">5</button>
-    <button id="six" @click="add(6)">6</button>
+    <button id="four" @click="add('4')">4</button>
+    <button id="five" @click="add('5')">5</button>
+    <button id="six" @click="add('6')">6</button>
     <button id="minus" @click="add('-')">-</button>
-    <button id="one" @click="add(1)">1</button>
-    <button id="two" @click="add(2)">2</button>
-    <button id="three" @click="add(3)">3</button>
+    <button id="one" @click="add('1')">1</button>
+    <button id="two" @click="add('2')">2</button>
+    <button id="three" @click="add('3')">3</button>
     <button id="plus" @click="add('+')">+</button>
-    <button id="zero" @click="add(0)">0</button>
+    <button id="zero" @click="add('0')">0</button>
     <button id="dot" @click="add('.')">.</button>
     <button id="equal" @click="calcResult">=</button>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, getCurrentInstance, computed } from "@vue/runtime-core";
+import { defineComponent, ref, onMounted, computed } from "@vue/runtime-core";
 
 export default defineComponent({
   setup () {
@@ -51,35 +51,57 @@ export default defineComponent({
     const resultNum = ref<Element>(document.createElement('a'))
 
     onMounted(() => {
-      // console.log(resultNum.value)
-      // console.log(resultBox.value.clientWidth)
-      // console.log(resultNum.value.clientWidth)
       numberLength = resultBox.value.clientWidth / resultNum.value.clientWidth
-      // console.log(numberLength)
     })
 
-    const add = (symbol: number | string) => {
+    const isOperation = (symbol: string) => ['+', '-', '÷', '×', '.'].includes(symbol)
+    const isLastOperation = () => isOperation(getLastSymbol())
+    const isZero = () => result.value === '0'
+    const getLastSymbol = () => result.value.charAt(result.value.length - 1)
+    const popResult = () => result.value = result.value.slice(0, result.value.length - 1)
+
+    const add = (symbol: string) => {
       if (result.value === 'ERROR') {
         result.value = ''
       }
-      if (typeof symbol === 'number') {
-        if (result.value === '0') {
-          result.value = ''
+      if (isOperation(symbol)) {
+        if (isLastOperation()) {
+          switch (symbol) {
+            case '+':
+            case '÷':
+            case '×':
+              popResult()
+              break
+            case '-':
+              if (getLastSymbol() === '+' || getLastSymbol() === '-') {
+                popResult()
+              }
+              break
+            case '.':
+              symbol = ''
+              break
+          }
+        } else {
+          switch (symbol) {
+            case '-':
+              if (isZero()) {
+                result.value = ''
+              }
+              break
+          }
         }
-        symbol = symbol.toString()
-      } else if (typeof symbol === 'string') {
-        switch (symbol) {
-          case '-':
-            if (result.value === '0') {
-              result.value = ''
-            }
-            break
+      } else {
+        if (isZero()) {
+          result.value = ''
         }
       }
       result.value += symbol
     }
 
     const calcResult = () => {
+      if (isLastOperation()) {
+        popResult()
+      }
       result.value = result.value.replaceAll('×', '*')
       result.value = result.value.replaceAll('÷', '/')
       // console.log(result.value)
@@ -121,6 +143,10 @@ export default defineComponent({
     }
   }
 })
+
+function popResult() {
+throw new Error("Function not implemented.");
+}
 </script>
 
 <style lang="scss" scoped>
